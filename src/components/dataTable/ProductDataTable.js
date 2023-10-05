@@ -4,7 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { userColumns, userRows } from "../../datatablesource";
 import { Link } from "react-router-dom";
 
-const Datatable = () => {
+const ProductDataTable = () => {
   const actionColumn = [
     {
       field: "action",
@@ -26,16 +26,16 @@ const Datatable = () => {
   return (
     <div className="dataTable">
       <div className="datatableTitle">
-        Add New User
+        Add New Product
         <Link
-          to="/users/new"
+          to="/products/new"
           style={{ textDecoration: "none" }}
           className="link"
         >
           Add New
         </Link>
       </div>
-      
+
       <DataGrid
         rows={userRows}
         columns={userColumns.concat(actionColumn)}
@@ -51,4 +51,20 @@ const Datatable = () => {
   );
 };
 
-export default Datatable;
+//   return (
+//     <div className="dataTable">
+//       <div className="datatableTitle">
+//         Add New Product
+//         <Link
+//           to="/products/new"
+//           style={{ textDecoration: "none" }}
+//           className="link"
+//         >
+//           Add New
+//         </Link>
+//       </div>
+
+//     </div>
+//   );
+
+export default ProductDataTable;
