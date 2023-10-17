@@ -6,12 +6,8 @@ import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import InsertChartIcon from "@mui/icons-material/InsertChart";
-import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import SettingsSystemDaydreamOutlinedIcon from "@mui/icons-material/SettingsSystemDaydreamOutlined";
-import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
@@ -43,55 +39,40 @@ const Sidebar = () => {
             <span>Products</span>
           </li>
           </Link>
+          <Link to="/guide" style={{textDecoration : "none"}}>
           <li>
             <ViewStreamOutlinedIcon className="icon" />
-            <span>Order</span>
+            <span>Cultivation Guide</span>
           </li>
+          </Link>
 
           <li>
             <LocalShippingIcon className="icon" />
-            <span>Delivery</span>
+            <span>Orders</span>
           </li>
-          <p className="title">USEFUL</p>
+          {/* <p className="title">USEFUL</p> */}
+          <Link to="/marketnearme" style={{textDecoration : "none"}}>
           <li>
             <InsertChartIcon className="icon" />
-            <span>Stats</span>
+            <span>Markets Near me</span>
           </li>
+          </Link>
 
           <li>
-            <NotificationsNoneOutlinedIcon className="icon" />
-            <span>Notifications</span>
+            <MonetizationOnOutlinedIcon className="icon" />
+            <span>Price Listing</span>
           </li>
-          <p className="title">SERVICE</p>
+          <Link to="/fertilizers" style={{textDecoration : "none"}}>
           <li>
-            <SettingsSystemDaydreamOutlinedIcon className="icon" />
-            <span>System Health</span>
+            <MonetizationOnOutlinedIcon className="icon" />
+            <span>Seeds & Fertilizers </span>
           </li>
-
-          <li>
-            <PsychologyOutlinedIcon className="icon" />
-            <span>Logs</span>
-          </li>
-
-          <li>
-            <SettingsApplicationsIcon className="icon" />
-            <span>Settings</span>
-          </li>
-          <p className="title">USER</p>
-          <li>
-            <AccountCircleOutlinedIcon className="icon" />
-            <span>Profile</span>
-          </li>
-
+          </Link>
           <li>
             <LogoutOutlinedIcon className="icon" />
             <span>Logout</span>
           </li>
         </ul>
-      </div>
-      <div className="bottom">
-        <div className="colorOptions"></div>
-        <div className="colorOptions"></div>
       </div>
     </div>
   );

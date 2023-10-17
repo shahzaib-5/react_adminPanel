@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
 import "./new.scss";
+import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
-import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
-import {
-  doc,
-  setDoc,
-  addDoc,
-  collection,
-  serverTimestamp,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-const New = ({ inputs, title }) => {
+
+const NewGuide = ({ guide, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
-  const [percentage , setPercentage] = useState(null)
-  const navigate = useNavigate()
-
+  const [percentage, setPercentage] = useState(null);
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+    const id = e.target.id;
+    const value = e.target.value;
+    setData({ ...data, [id]: value });
+  };
   useEffect(() => {
     const uploadFile = () => {
       const name = new Date().getTime() + file.name;
@@ -26,11 +25,11 @@ const New = ({ inputs, title }) => {
       const uploadTask = uploadBytesResumable(storageRef, file);
       uploadTask.on(
         "state_changed",
-        (snapshot) => { 
+        (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
-          setPercentage(progress)
+          setPercentage(progress);
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -41,31 +40,25 @@ const New = ({ inputs, title }) => {
           }
         },
         (error) => {
-          console.log(error)
+          console.log(error);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setData((prev)=>({...prev , img:downloadURL}))
+            setData((prev) => ({ ...prev, img: downloadURL }));
           });
         }
       );
     };
     file && uploadFile();
   }, [file]);
-  const handleChange = (e) => {
-    const id = e.target.id;
-    const value = e.target.value;
-    setData({ ...data, [id]: value });
-  };
-  // console.log(data)
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await addDoc(collection(db, "users"), {
+      const res = await addDoc(collection(db, "guide"), {
         ...data,
         timeStamp: serverTimestamp(),
       });
-      navigate(-1)
+      navigate(-1);
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +71,7 @@ const New = ({ inputs, title }) => {
         <div className="top">
           <h1>{title}</h1>
         </div>
+
         <div className="bottom">
           <div className="left">
             <img
@@ -103,7 +97,7 @@ const New = ({ inputs, title }) => {
                   style={{ display: "none" }}
                 />
               </div>
-              {inputs.map((input) => (
+              {guide.map((input) => (
                 <div className="formInput" key={input.id}>
                   <label>{input.label}</label>
                   <input
@@ -114,7 +108,12 @@ const New = ({ inputs, title }) => {
                   />
                 </div>
               ))}
-              <button disabled={percentage!==null && percentage < 100} type="submit">Send</button>
+              <button
+                disabled={percentage !== null && percentage < 100}
+                type="submit"
+              >
+                Send
+              </button>
             </form>
           </div>
         </div>
@@ -123,4 +122,4 @@ const New = ({ inputs, title }) => {
   );
 };
 
-export default New;
+export default NewGuide;

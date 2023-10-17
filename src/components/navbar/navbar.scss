@@ -11,7 +11,7 @@
         display: flex;
         align-items: center;
         padding: 20px;
-        justify-content: space-between;
+        justify-content: center;
 
         .title{
                  font-size: 20px;
@@ -21,50 +21,6 @@
                 justify-content: center;
         }
 
-        .search{
-            display: flex;
-            align-items: center;
-            border: 0.5px solid lightgray;
-            padding: 3px;
-
-            input{
-                border: none;
-                outline: none;
-                background-color : transparent;
-            }
-        }
-
-        .items{
-            display: flex;
-            align-items: center;
-
-            .item{
-                display: flex;
-                align-items: center;
-                margin: 10px;
-                position: relative;
-
-                .icon{
-                    font-size: 20px;
-                }
-
-                .counter{
-                    width: 15px;
-                    height: 15px;
-                    background-color: red;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                    color: white;
-                    font-size: 10px;
-                    font-weight: bold;
-                    position: absolute;
-                    top: -5px;
-                    right: -5px;
-
-                }
-            }
-        }
+       
     }
 }
