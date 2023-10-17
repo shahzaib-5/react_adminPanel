@@ -11,6 +11,7 @@ import List from "./pages/list/List";
 import Login from "./pages/login/Login";
 import New from "./pages/new/New";
 import Single from "./pages/single/Single";
+<<<<<<< HEAD
 import { fertilizersInput, guideInputs, marketInputs, productInputs, updateGuideInputs, userInputs } from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import GuideList from "./pages/list/GuideList";
@@ -23,12 +24,22 @@ import UpdateMarket from "./pages/single/UpdateMarket";
 import NewFertilizers from "./pages/new/NewFertilizers";
 import FertilizersList from "./pages/list/FertilizersList";
 import UpdateFertilizers from "./pages/single/UpdateFertilizers";
+=======
+import { productInputs, userInputs } from "./formSource";
+import { AuthContext } from "./context/AuthContext";
+import ProductList from "./pages/list/ProductList";
+import NewProduct from "./pages/new/NewProduct";
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
 
 function App() {
   const { currentUser } = useContext(AuthContext);
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/login" />;
   };
+<<<<<<< HEAD
+=======
+  console.log(currentUser)
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
   return (
     <div className="App">
       <Router>
@@ -76,7 +87,11 @@ function App() {
                 index
                 element={
                   <RequireAuth>
+<<<<<<< HEAD
                     <List />
+=======
+                    <ProductList />
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
                   </RequireAuth>
                 }
               />
@@ -92,11 +107,16 @@ function App() {
                 path="new"
                 element={
                   <RequireAuth>
+<<<<<<< HEAD
                     <New inputs={productInputs} title="Add New Product" />
+=======
+                    <NewProduct productInputs={productInputs} title="Add New Product" />
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
                   </RequireAuth>
                 }
               />
             </Route>
+<<<<<<< HEAD
 
             <Route path="guide">
               <Route
@@ -183,6 +203,8 @@ function App() {
 
 
             
+=======
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
           </Route>
         </Routes>
       </Router>

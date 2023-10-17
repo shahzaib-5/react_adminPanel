@@ -69,7 +69,11 @@ const Datatable = () => {
           Add New
         </Link> */}
       </div>
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
       <DataGrid
         rows={data}
         columns={userColumns.concat(actionColumn)}
