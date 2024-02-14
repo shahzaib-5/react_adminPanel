@@ -10,6 +10,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import {toast} from "react-hot-toast"
 
 const GuideDataTable = () => {
   const [data, setData] = useState([]);
@@ -31,8 +32,9 @@ const GuideDataTable = () => {
     try {
       await deleteDoc(doc(db, "guide", id));
       setData(data.filter((item) => item.id !== id));
+      toast.success("Cultivation Guide Deleted Successfully")
     } catch (error) {
-      console.log(error);
+      toast.error("Cultivation Guide not Deleted")
     }
   };
   const actionColumn = [
@@ -44,6 +46,9 @@ const GuideDataTable = () => {
         return (
           <div className="cellAction">
             <Link to={`/guide/${params.row.id}`} style={{ textDecoration: "none" }}>
+              <div className="viewButton">View</div>
+            </Link>
+            <Link to={`/guide/update/${params.row.id}`} style={{ textDecoration: "none" }}>
               <div className="viewButton">Update</div>
             </Link>
             <div

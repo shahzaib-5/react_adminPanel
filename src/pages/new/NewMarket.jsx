@@ -7,10 +7,19 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const NewMarket = ({ market, title }) => {
   const [file, setFile] = useState("");
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    name: "",
+    address: "",
+    city: "",
+    latitude: "",
+    longitude: "",
+    operatingHours: "",
+    contactInfo: "",
+  });
   const [percentage, setPercentage] = useState(null);
   const [daysOfOperation, setDaysOfOperation] = useState({
     monday: false,
@@ -24,15 +33,28 @@ const NewMarket = ({ market, title }) => {
   const [availableProducts, setAvailableProducts] = useState({
     fruits: false,
     vegetables: false,
+    grains : false
   });
+
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const id = e.target.id;
     const value = e.target.value;
     setData({ ...data, [id]: value });
+    setErrors({ ...errors, [id]: "" });
   };
 
+  // const handleCheckboxChange = (e) => {
+  //   const checkboxId = e.target.id;
+  //   const isChecked = e.target.checked;
+  //   setDaysOfOperation((prevDays) => ({
+  //     ...prevDays,
+  //     [checkboxId]: isChecked,
+  //   }));
+  //   setErrors({ ...errors, [checkboxId]: "" });
+  // };
   const handleCheckboxChange = (e) => {
     const checkboxId = e.target.id;
     const isChecked = e.target.checked;
@@ -40,7 +62,25 @@ const NewMarket = ({ market, title }) => {
       ...prevDays,
       [checkboxId]: isChecked,
     }));
+    if (Object.values(daysOfOperation).some((value) => value)) {
+      setErrors({ ...errors, daysOfOperation: "" });
+    } else {
+      setErrors({
+        ...errors,
+        daysOfOperation: "Please select at least one day of operation",
+      });
+    }
   };
+
+  // const handleAvailableProductsChange = (e) => {
+  //   const product = e.target.id;
+  //   const isChecked = e.target.checked;
+  //   setAvailableProducts((prevProducts) => ({
+  //     ...prevProducts,
+  //     [product]: isChecked,
+  //   }));
+  //   setErrors({ ...errors, [product]: "" });
+  // };
 
   const handleAvailableProductsChange = (e) => {
     const product = e.target.id;
@@ -49,6 +89,16 @@ const NewMarket = ({ market, title }) => {
       ...prevProducts,
       [product]: isChecked,
     }));
+
+    // Clear the error for "Available Products" if at least one checkbox is checked
+    if (availableProducts.fruits || availableProducts.vegetables || availableProducts.grains) {
+      setErrors({ ...errors, availableProducts: "" });
+    } else {
+      setErrors({
+        ...errors,
+        availableProducts: "Please select at least one available product",
+      });
+    }
   };
 
   useEffect(() => {
@@ -78,24 +128,69 @@ const NewMarket = ({ market, title }) => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setData((prev) => ({ ...prev, img: downloadURL }));
+            toast.success("Image Uploaded Successfully");
           });
         }
       );
     };
     file && uploadFile();
   }, [file]);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    // Clear the error when the file is selected
+    setErrors({ ...errors, file: "" });
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    if (!file) {
+      newErrors.file = "Image is required";
+    }
+    if (!data.name) {
+      newErrors.name = "Name is required";
+    }
+    if (!data.address) {
+      newErrors.address = "Address is required";
+    }
+    if (!data.city) {
+      newErrors.city = "City is required";
+    }
+    if (!data.latitude) {
+      newErrors.latitude = "Latitude is required";
+    }
+    if (!data.longitude) {
+      newErrors.longitude = "Longitude is required";
+    }
+    if (!data.operatingHours) {
+      newErrors.operatingHours = "Operating Hours is required";
+    }
+    if (!data.contactInfo) {
+      newErrors.contactInfo = "Contact is required";
+    }
+
+    if (!Object.values(daysOfOperation).some((value) => value)) {
+      newErrors.daysOfOperation = "Please select at least one day of operation";
+    }
+    if (!Object.values(availableProducts).some((value) => value)) {
+      newErrors.availableProducts = "Please select at least one available product";
+    }
+    
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     const newData = { ...data, daysOfOperation, availableProducts };
     try {
       const res = await addDoc(collection(db, "marketNearMe"), {
         ...newData,
         timeStamp: serverTimestamp(),
       });
+      toast.success("New market Added Successfully");
       navigate(-1);
     } catch (error) {
-      console.log(error);
+      toast.error("New Market not Added");
     }
   };
 
@@ -129,9 +224,10 @@ const NewMarket = ({ market, title }) => {
                 <input
                   type="file"
                   id="file"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={handleFileChange}
                   style={{ display: "none" }}
                 />
+                {errors.file && <span className="error">{errors.file}</span>}
               </div>
               {market.map((input) => (
                 <div className="formInput" key={input.id}>
@@ -142,13 +238,42 @@ const NewMarket = ({ market, title }) => {
                     placeholder={input.placeholder}
                     onChange={handleChange}
                   />
+                  {errors[input.id] && (
+                    <span className="error">{errors[input.id]}</span>
+                  )}
                 </div>
               ))}
+
+              <div className="formInput">
+                <label>Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="longitude"
+                  placeholder="Longitude"
+                  onChange={handleChange}
+                />
+                {errors.longitude && (
+                  <span className="error">{errors.longitude}</span>
+                )}
+              </div>
+              <div className="formInput">
+                <label>Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="latitude"
+                  placeholder="Latitude"
+                  onChange={handleChange}
+                />
+                {errors.latitude && (
+                  <span className="error">{errors.latitude}</span>
+                )}
+              </div>
               <div className="formInput">
                 <label>Days of Operation:</label>
                 <div className="checkboxes">
                   {Object.keys(daysOfOperation).map((day) => (
-                    
                     <label key={day} htmlFor={day}>
                       {day.charAt(0).toUpperCase() + day.slice(1)}:
                       <input
@@ -159,6 +284,9 @@ const NewMarket = ({ market, title }) => {
                       />
                     </label>
                   ))}
+                  {errors.daysOfOperation && (
+                    <span className="error">{errors.daysOfOperation}</span>
+                  )}
                 </div>
               </div>
               <div className="formInput">
@@ -182,6 +310,18 @@ const NewMarket = ({ market, title }) => {
                       onChange={handleAvailableProductsChange}
                     />
                   </label>
+                  <label htmlFor="grains">
+                    Grains:
+                    <input
+                      type="checkbox"
+                      id="grains"
+                      checked={availableProducts.grains}
+                      onChange={handleAvailableProductsChange}
+                    />
+                  </label>
+                  {errors.availableProducts && (
+                    <span className="error">{errors.availableProducts}</span>
+                  )}
                 </div>
               </div>
               <button
@@ -199,29 +339,6 @@ const NewMarket = ({ market, title }) => {
 };
 
 export default NewMarket;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import React, { useEffect, useState } from "react";
 // import "./new.scss";
@@ -331,9 +448,9 @@ export default NewMarket;
 //                     placeholder={input.placeholder}
 //                     onChange={handleChange}
 //                   />
-                  
+
 //                 </div>
-                
+
 //               ))}
 //               <button
 //                 disabled={percentage !== null && percentage < 100}
@@ -350,4 +467,3 @@ export default NewMarket;
 // };
 
 // export default NewMarket;
-

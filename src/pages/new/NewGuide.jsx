@@ -7,16 +7,23 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const NewGuide = ({ guide, title }) => {
   const [file, setFile] = useState("");
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    title: "",
+    content: "",
+    category: "",
+  });
   const [percentage, setPercentage] = useState(null);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const handleChange = (e) => {
     const id = e.target.id;
     const value = e.target.value;
     setData({ ...data, [id]: value });
+    setErrors({ ...errors, [id]: "" });
   };
   useEffect(() => {
     const uploadFile = () => {
@@ -30,6 +37,7 @@ const NewGuide = ({ guide, title }) => {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log("Upload is " + progress + "% done");
           setPercentage(progress);
+
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -45,18 +53,46 @@ const NewGuide = ({ guide, title }) => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setData((prev) => ({ ...prev, img: downloadURL }));
+            toast.success("Image Uploaded Successfully");
           });
         }
       );
     };
     file && uploadFile();
   }, [file]);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    // Clear the error when the file is selected
+    setErrors({ ...errors, file: "" });
+  };
   const handleAdd = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    if (!file) {
+      newErrors.file = "Image is required";
+    }
+    if (!data.title) {
+      newErrors.title = "Title is required";
+    }
+    if (!data.content) {
+      newErrors.content = "Content is required";
+    }
+    if (!data.category) {
+      newErrors.category = "Category is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     try {
       const res = await addDoc(collection(db, "guide"), {
         ...data,
         timeStamp: serverTimestamp(),
+      });
+      toast.success("Cultivation Guide Added Sucessfully", {
+        duration: 2000,
       });
       navigate(-1);
     } catch (error) {
@@ -93,9 +129,10 @@ const NewGuide = ({ guide, title }) => {
                 <input
                   type="file"
                   id="file"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={handleFileChange}
                   style={{ display: "none" }}
                 />
+                {errors.file && <span className="error">{errors.file}</span>}
               </div>
               {guide.map((input) => (
                 <div className="formInput" key={input.id}>
@@ -106,8 +143,22 @@ const NewGuide = ({ guide, title }) => {
                     placeholder={input.placeholder}
                     onChange={handleChange}
                   />
+                  {errors[input.id] && (
+                    <span className="error">{errors[input.id]}</span>
+                  )}
                 </div>
               ))}
+              <div className="formInput">
+                <label htmlFor="content">Content</label>
+                <textarea
+                  id="content"
+                  placeholder="Enter content here"
+                  onChange={handleChange}
+                />
+                {errors.content && (
+                  <span className="error">{errors.content}</span>
+                )}
+              </div>
               <button
                 disabled={percentage !== null && percentage < 100}
                 type="submit"

@@ -5,35 +5,38 @@ import { userColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { toast } from "react-hot-toast";
 
 const Datatable = () => {
   const [data, setData] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      let list = [];
-      try {
-        const querySnapshot = await getDocs(collection(db, "UserCollection"));
-        querySnapshot.forEach((doc) => {
-          list.push({ id: doc.id, ...doc.data() });
-        });
-        setData(list);
-        console.log(list);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, []);
-  console.log(data);
 
-  const handleDelete = async (id) => {
+  const fetchData = async () => {
+    let list = [];
     try {
-      await deleteDoc(doc(db, "userCollection", id));
-      setData(data.filter((item) => item.id !== id));
+      const querySnapshot = await getDocs(collection(db, "UserCollection"));
+      querySnapshot.forEach((doc) => {
+        list.push({ id: doc.id, ...doc.data() });
+      });
+      setData(list);
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, "UserCollection", id));
+      setData(data.filter((item) => item.id !== id));
+      toast.success("User Deleted Successfully")
+    } catch (error) {
+      toast.error("User not Deleted")
+    }
+  };
+
   const actionColumn = [
     {
       field: "action",
@@ -42,9 +45,9 @@ const Datatable = () => {
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            {/* <Link to="/" style={{ textDecoration: "none" }}>
-              <div className="viewButton">Update</div>
-            </Link> */}
+            <Link to={`/users/${params.row.id}`} style={{ textDecoration: "none" }}>
+              <div className="viewButton">View</div>
+            </Link>
             <div
               className="deleteButton"
               onClick={() => handleDelete(params.row.id)}
@@ -61,19 +64,7 @@ const Datatable = () => {
     <div className="dataTable">
       <div className="datatableTitle">
         All User
-        {/* <Link
-          to="/users/new"
-          style={{ textDecoration: "none" }}
-          className="link"
-        >
-          Add New
-        </Link> */}
       </div>
-<<<<<<< HEAD
-
-=======
-      
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
       <DataGrid
         rows={data}
         columns={userColumns.concat(actionColumn)}
@@ -83,7 +74,6 @@ const Datatable = () => {
           },
         }}
         pageSizeOptions={[5, 10]}
-        // checkboxSelection
       />
     </div>
   );

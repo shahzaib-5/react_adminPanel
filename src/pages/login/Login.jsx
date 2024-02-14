@@ -4,41 +4,68 @@ import { auth } from "../../firebase";
 import "./login.scss";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
+import { TypeAnimation } from "react-type-animation";
 
 const Login = () => {
-  const [error, setError] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const {dispatch} = useContext(AuthContext)
+  const { dispatch } = useContext(AuthContext);
+
   const handleLogin = (e) => {
     e.preventDefault();
+
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        dispatch({type : "LOGIN" , payload : user})
+        dispatch({ type: "LOGIN", payload: user });
+        toast.success("Login successful");
         navigate("/");
       })
       .catch((error) => {
-        setError(true);
+        toast.error("Login failed. Please check your email and password.");
       });
   };
+
   return (
     <div className="login">
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="email"
-          onChange={(e) => setEmail(e.target.value)}
+      <div className="left-section">
+        <TypeAnimation
+          sequence={[
+            "KISAAN E-SAHULAT Admin Portal",
+            1000,
+            "Your Gateway to Control",
+            1000,
+            "Secure Access for Administrators",
+            1000,
+            "Explore the Admin Dashboard",
+            1000,
+          ]}
+          wrapper="p"
+          speed={50}
+          repeat={Infinity}
         />
-        <input
-          type="password"
-          placeholder="password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-        {error && <span>Wrong email and Password</span>}
-      </form>
+      </div>
+      <div className="right-section">
+        <div>
+          <h1>KISAAN E-SAHULAT</h1>
+          <h3>Happy to see you again</h3>
+          <form onSubmit={handleLogin}>
+            <input
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">Login</button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

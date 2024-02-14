@@ -7,22 +7,35 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import {toast} from "react-hot-toast"
+
 
 const NewFertilizers = ({ fertilizers, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({
-    productAvailability: "instock",
+    productName: "",
+    productCategory: "",
+    productDescription: "",
+    productCompany:"",
+    productPrice: "",
+    productQuantity: "",
+    productAvailability: "",
   });
   const [percentage, setPercentage] = useState(null);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [dropdownError, setDropdownError] = useState("");
   const handleChange = (e) => {
     const id = e.target.id;
     const value = e.target.value;
     setData({ ...data, [id]: value });
+    setErrors({ ...errors, [id]: "" });
   };
   const handleAvailabilityChange = (e) => {
     const value = e.target.value;
     setData({ ...data, productAvailability: value });
+    // setErrors({ ...data, productAvailability: "" });
+    setDropdownError("");
   };
   useEffect(() => {
     const uploadFile = () => {
@@ -51,22 +64,60 @@ const NewFertilizers = ({ fertilizers, title }) => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setData((prev) => ({ ...prev, img: downloadURL }));
+            toast.success("Image Uploaded Successfully");
           });
         }
       );
     };
     file && uploadFile();
   }, [file]);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    // Clear the error when the file is selected
+    setErrors({ ...errors, file: "" });
+  };
   const handleAdd = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    if (!file) {
+      newErrors.file = "Image is required";
+    }
+    if (!data.productName) {
+      newErrors.productName = "Name is required";
+    }
+    if (!data.productDescription) {
+      newErrors.productDescription = "Description is required";
+    }
+    if (!data.productCompany) {
+      newErrors.productCompany = "Description is required";
+    }
+
+    if (!data.productCategory) {
+      newErrors.productCategory = "Category is required";
+    }
+    if (!data.productPrice) {
+      newErrors.productPrice = "Price is required";
+    }
+    if (!data.productQuantity) {
+      newErrors.productQuantity = "Quantity is required";
+    }
+    if (!data.productAvailability) {
+      newErrors.productAvailability = "Availability is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     try {
       const res = await addDoc(collection(db, "fertilizers"), {
         ...data,
         timeStamp: serverTimestamp(),
       });
+      toast.success("Fertilizer Added Successfully")
       navigate(-1);
     } catch (error) {
-      console.log(error);
+      toast.error("Fertilizer not Added")
     }
   };
   return (
@@ -99,9 +150,10 @@ const NewFertilizers = ({ fertilizers, title }) => {
                 <input
                   type="file"
                   id="file"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={handleFileChange}
                   style={{ display: "none" }}
                 />
+                {errors.file && <span className="error">{errors.file}</span>}
               </div>
               {fertilizers.map((input) => (
                 <div className="formInput" key={input.id}>
@@ -112,10 +164,11 @@ const NewFertilizers = ({ fertilizers, title }) => {
                     placeholder={input.placeholder}
                     onChange={handleChange}
                   />
+                  {errors[input.id] && <span className="error">{errors[input.id]}</span>}
                 </div>
               ))}
               <div className="formInput">
-              <label>Product Price</label>
+                <label>Product Price</label>
                 <input
                   type="number"
                   id="productPrice"
@@ -123,9 +176,10 @@ const NewFertilizers = ({ fertilizers, title }) => {
                   onChange={handleChange}
                   min="0"
                 />
+                {errors.productPrice && <span className="error">{errors.productPrice}</span>}
               </div>
               <div className="formInput">
-              <label>Product Quantity</label>
+                <label>Product Quantity</label>
                 <input
                   type="number"
                   id="productQuantity"
@@ -133,6 +187,7 @@ const NewFertilizers = ({ fertilizers, title }) => {
                   onChange={handleChange}
                   min="0"
                 />
+                {errors.productQuantity && <span className="error">{errors.productQuantity}</span>}
               </div>
               <div className="formInput">
                 <label>Product Availability</label>
@@ -140,10 +195,13 @@ const NewFertilizers = ({ fertilizers, title }) => {
                   id="productAvailability"
                   onChange={handleAvailabilityChange}
                 >
+                  <option value="">Select availability</option>
                   <option value="instock">In Stock</option>
                   <option value="outofstock">Out of Stock</option>
                 </select>
+                {dropdownError && <span className="error">{dropdownError}</span>}
               </div>
+              
               <button
                 disabled={percentage !== null && percentage < 100}
                 type="submit"

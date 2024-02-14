@@ -5,6 +5,7 @@ import { marketColumn } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import {toast} from "react-hot-toast"
 
 const NearMeDataTable = () => {
   const [data, setData] = useState([]);
@@ -48,8 +49,9 @@ const NearMeDataTable = () => {
     try {
       await deleteDoc(doc(db, "marketNearMe", id));
       setData(data.filter((item) => item.id !== id));
+      toast.success("Market Deleted Successfully")
     } catch (error) {
-      console.log(error);
+      toast.error("Market not Deleted Successfully")
     }
   };
   const actionColumn = [
@@ -62,6 +64,12 @@ const NearMeDataTable = () => {
           <div className="cellAction">
             <Link
               to={`/marketnearme/${params.row.id}`}
+              style={{ textDecoration: "none" }}
+            >
+              <div className="viewButton">View</div>
+            </Link>
+            <Link
+              to={`/marketnearme/update/${params.row.id}`}
               style={{ textDecoration: "none" }}
             >
               <div className="viewButton">Update</div>
@@ -78,6 +86,7 @@ const NearMeDataTable = () => {
     },
   ];
 
+  
   return (
     <div className="dataTable">
       <div className="datatableTitle">
@@ -92,7 +101,11 @@ const NearMeDataTable = () => {
       </div>
 
       <DataGrid
-        rows={data}
+        rows={data.map((row) => ({
+          ...row,
+          availableProducts: getAvailableProductsString(row.availableProducts),
+          daysOfOperation: getDaysOfOperationString(row.daysOfOperation),
+        }))}
         columns={marketColumn.concat(actionColumn)}
         initialState={{
           pagination: {
@@ -100,10 +113,30 @@ const NearMeDataTable = () => {
           },
         }}
         pageSizeOptions={[5, 10]}
-        // checkboxSelection
       />
     </div>
   );
 };
+
+function getAvailableProductsString(availableProducts) {
+  const products = [];
+  if (availableProducts.fruits) {
+    products.push("Fruits");
+  }
+  if (availableProducts.vegetables) {
+    products.push("Vegetables");
+  }
+  return products.join(", ");
+}
+
+function getDaysOfOperationString(daysOfOperation) {
+  const days = [];
+  for (const day in daysOfOperation) {
+    if (daysOfOperation[day]) {
+      days.push(day.charAt(0).toUpperCase() + day.slice(1));
+    }
+  }
+  return days.join(", ");
+}
 
 export default NearMeDataTable;

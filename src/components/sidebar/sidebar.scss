@@ -1,79 +1,83 @@
-.sidebar{
+.sidebar {
     flex: 1;
     border-right: 0.5px solid rgb(216, 210, 210);
     min-height: 100vh;
-    background-color: white;
-    .top{
-        height: 50px;
+    background-color: #5a46a0;
+
+    &:hover { 
+        .top .logo {
+            color: #fff; 
+        }
+        .center ul li:hover {
+            background-color: #ece8ff; 
+        }
+        .center ul li:hover .icon,
+        .center ul li:hover span {
+            color: #5a46a0;
+        }
+    }
+
+    .top {
+        height: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-            .logo{
-                font-size: 20px;
-                font-weight: bold;
-                color: #725ac5;
-            }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
     }
-    hr{
+    hr {
         height: 0;
         border: 0.5px solid rgb(216, 210, 210);
     }
-    .center{
+    .center {
         padding-left: 10px;
-        ul{
+        ul {
             list-style: none;
             margin: 0;
             padding: 0;
-
-            .title{
+            .title {
                 font-size: 10px;
                 font-weight: bold;
                 margin-top: 15px;
                 margin-bottom: 5px;
-                color: #999;
+                color: #fff;
             }
-            li{
+            li {
                 display: flex;
                 align-items: center;
                 padding: 10px;
                 cursor: pointer;
-
-                &:hover{
-                    background-color: #ece8ff;
+                .icon {
+                    font-size: 18px;
+                    color: #fff;
                 }
-
-                .icon{
-                    font-size : 18px;
-                    color:#725ac5 ;
-                }
-                span{
+                span {
                     font-size: 13px;
                     font-weight: 600;
-                    color: #888;
+                    color: #fff;
                     margin-left: 10px;
                 }
             }
         }
     }
-
-    .bottom{
+    .bottom {
         display: flex;
         align-items: center;
-        margin : 10px;
-
-        .colorOptions{
+        margin: 10px;
+        .colorOptions {
             width: 20px;
             height: 20px;
             border-radius: 5px;
             border: 1px solid;
             cursor: pointer;
             margin: 5px;
-
-            &:nth-child(1){
+            &:nth-child(1) {
                 background-color: whitesmoke;
             }
-
-            &:nth-child(2){
+            &:nth-child(2) {
                 background-color: #333;
             }
         }

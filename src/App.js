@@ -1,21 +1,23 @@
-import {React , useContext} from "react";
+import { React, useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  
 } from "react-router-dom";
 import Home from "./pages/home/Home";
 import List from "./pages/list/List";
 import Login from "./pages/login/Login";
 import New from "./pages/new/New";
 import Single from "./pages/single/Single";
-<<<<<<< HEAD
-import { fertilizersInput, guideInputs, marketInputs, productInputs, updateGuideInputs, userInputs } from "./formSource";
+import {
+  fertilizersInput,
+  guideInputs,
+  marketInputs,
+  userInputs,
+} from "./formSource";
 import { AuthContext } from "./context/AuthContext";
 import GuideList from "./pages/list/GuideList";
-import SingleGuide from "./pages/single/UpdateGuide";
 import NewGuide from "./pages/new/NewGuide";
 import MarketNearMeList from "./pages/list/MarketNearMeList";
 import NewMarket from "./pages/new/NewMarket";
@@ -24,25 +26,32 @@ import UpdateMarket from "./pages/single/UpdateMarket";
 import NewFertilizers from "./pages/new/NewFertilizers";
 import FertilizersList from "./pages/list/FertilizersList";
 import UpdateFertilizers from "./pages/single/UpdateFertilizers";
-=======
-import { productInputs, userInputs } from "./formSource";
-import { AuthContext } from "./context/AuthContext";
+import NewPrice from "./pages/new/NewPrice";
+import UpdatePrice from "./pages/single/UpdatePrice";
+import PriceList from "./pages/list/PriceList";
+import { Toaster } from "react-hot-toast";
 import ProductList from "./pages/list/ProductList";
-import NewProduct from "./pages/new/NewProduct";
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
+import OrderList from "./pages/list/OrderList";
+import SingleOrder from "./pages/single/SingleOrder";
+import SingleUser from "./pages/single/SingleUser";
+import SingleItem from "./pages/single/SingleItem";
+import SingleGuide from "./pages/single/SingleGuide";
+import SingleMarket from "./pages/single/SingleMarket";
+import SinglePriceListing from "./pages/single/SinglePriceListing";
+import SingleFertilizer from "./pages/single/SingleFertilizer";
+import TransportCompanyList from "./pages/list/TransportCompanyList";
+import SingleTransportCompany from "./pages/single/SingleTransportCompany";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
+
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/login" />;
   };
-<<<<<<< HEAD
-=======
-  console.log(currentUser)
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
   return (
     <div className="App">
       <Router>
+        <Toaster position="top-center" />
         <Routes>
           <Route path="/">
             <Route path="login" element={<Login />} />
@@ -68,7 +77,7 @@ function App() {
                 path=":userId"
                 element={
                   <RequireAuth>
-                    <Single />
+                    <SingleUser />
                   </RequireAuth>
                 }
               />
@@ -87,11 +96,7 @@ function App() {
                 index
                 element={
                   <RequireAuth>
-<<<<<<< HEAD
-                    <List />
-=======
                     <ProductList />
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
                   </RequireAuth>
                 }
               />
@@ -99,24 +104,19 @@ function App() {
                 path=":productId"
                 element={
                   <RequireAuth>
-                    <Single />
+                    <SingleItem />
                   </RequireAuth>
                 }
               />
-              <Route
+              {/* <Route
                 path="new"
                 element={
                   <RequireAuth>
-<<<<<<< HEAD
                     <New inputs={productInputs} title="Add New Product" />
-=======
-                    <NewProduct productInputs={productInputs} title="Add New Product" />
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
                   </RequireAuth>
                 }
-              />
+              /> */}
             </Route>
-<<<<<<< HEAD
 
             <Route path="guide">
               <Route
@@ -127,20 +127,50 @@ function App() {
                   </RequireAuth>
                 }
               />
-               {/* <Route path="guide/update/:guideId" element={<UpdateGuide />} /> */}
+              {/* <Route path="guide/update/:guideId" element={<UpdateGuide />} /> */}
               <Route
                 path=":guideId"
                 element={
                   <RequireAuth>
-                    <UpdateGuide />
+                    {/* <UpdateGuide /> */}
+                    <SingleGuide />
                   </RequireAuth>
                 }
               />
+              <Route
+                path="update/:guideId"
+                element={
+                  <RequireAuth>
+                    <UpdateGuide />
+                    {/* <SingleGuide /> */}
+                  </RequireAuth>
+                }
+              />
+
               <Route
                 path="newguide"
                 element={
                   <RequireAuth>
                     <NewGuide guide={guideInputs} title="Add New Guide" />
+                  </RequireAuth>
+                }
+              />
+            </Route>
+
+            <Route path="orders">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <OrderList />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path=":ordersId"
+                element={
+                  <RequireAuth>
+                    <SingleOrder />
                   </RequireAuth>
                 }
               />
@@ -159,6 +189,14 @@ function App() {
                 path=":nearmeId"
                 element={
                   <RequireAuth>
+                    <SingleMarket />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="update/:nearmeId"
+                element={
+                  <RequireAuth>
                     <UpdateMarket />
                   </RequireAuth>
                 }
@@ -173,7 +211,6 @@ function App() {
               />
             </Route>
 
-
             <Route path="fertilizers">
               <Route
                 index
@@ -187,6 +224,14 @@ function App() {
                 path=":fertilizersId"
                 element={
                   <RequireAuth>
+                    <SingleFertilizer />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="update/:fertilizersId"
+                element={
+                  <RequireAuth>
                     <UpdateFertilizers />
                   </RequireAuth>
                 }
@@ -195,16 +240,77 @@ function App() {
                 path="newfertilizers"
                 element={
                   <RequireAuth>
-                    <NewFertilizers fertilizers={fertilizersInput} title="Add New Fertilizer" />
+                    <NewFertilizers
+                      fertilizers={fertilizersInput}
+                      title="Add New Fertilizer"
+                    />
                   </RequireAuth>
                 }
               />
             </Route>
 
+            <Route path="pricelisting">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <PriceList />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path=":pricelistingId"
+                element={
+                  <RequireAuth>
+                    <SinglePriceListing />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="update/:pricelistingId"
+                element={
+                  <RequireAuth>
+                    <UpdatePrice />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="newpricelisting"
+                element={
+                  <RequireAuth>
+                    <NewPrice
+                      fertilizers={fertilizersInput}
+                      title="Add New Fertilizer"
+                    />
+                  </RequireAuth>
+                }
+              />
+              
+            </Route>
+
+            <Route path="transportcompany">
+              <Route
+                index
+                element={
+                  <RequireAuth>
+                    <TransportCompanyList />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path=":transportcompanyId"
+                element={
+                  <RequireAuth>
+                    <SingleTransportCompany />
+                  </RequireAuth>
+                }
+              />
+              
+            </Route>
+
 
             
-=======
->>>>>>> e06c6d5b1fab4b867e2a612356feaa5aa9cc6fb1
+
           </Route>
         </Routes>
       </Router>

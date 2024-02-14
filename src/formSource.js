@@ -82,12 +82,12 @@ export const guideInputs = [
     type: "text",
     placeholder: "Enter Title",
   },
-  {
-    id: "content",
-    label: "Content",
-    type: "text",
-    placeholder: "Enter Description",
-  },
+  // {
+  //   id: "content",
+  //   label: "Content",
+  //   type: "text",
+  //   placeholder: "Enter Description",
+  // },
   {
     id: "category",
     label: "Category",
@@ -111,23 +111,37 @@ export const marketInputs =[
     placeholder: "Enter Address",
   },
   {
-    id: "latitude",
-    label: "Latitude",
+    id: "city",
+    label: "City",
     type: "text",
-    placeholder: "Enter Latitude",
+    placeholder: "Enter City",
   },
-  {
-    id: "longitude",
-    label: "Longitude",
-    type: "text",
-    placeholder: "Enter Longitude",
-  },
+  // {
+  //   id: "latitude",
+  //   label: "Latitude",
+  //   type: "text",
+  //   placeholder: "Enter Latitude",
+  // },
+  // {
+  //   id: "longitude",
+  //   label: "Longitude",
+  //   type: "text",
+  //   placeholder: "Enter Longitude",
+  // },
   {
     id: "operatingHours",
     label: "Operating Hours",
     type: "text",
     placeholder: "Enter Operating Hours",
   },
+  {
+    id: "contactInfo",
+    label: "Contact Info",
+    type: "text",
+    placeholder: "Enter Contact",
+  },
+
+  
 ]
 
 export const fertilizersInput =[
@@ -155,6 +169,14 @@ export const fertilizersInput =[
     type: "text",
     placeholder: "Enter Product Description",
   },
+
+  {
+    id: "productCompany",
+    label: "Product Company",
+    type: "text",
+    placeholder: "Enter Product Company",
+  },
+
   // {
   //   id: "productAvailability",
   //   label: "Product Availability",

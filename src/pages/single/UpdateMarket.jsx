@@ -8,53 +8,68 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import "../new/new.scss";
 import Navbar from "../../components/navbar/Navbar";
 import NearMeDataTable from "../../components/dataTable/NearMeDataTable";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const UpdateMarket = () => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
   const [percentage, setPercentage] = useState(null);
-  const { nearmeId } = useParams(); // Get the guide ID from the URL
+  const { nearmeId } = useParams();
   const [marketData, setMarketData] = useState({
     name: "",
     address: "",
+    city: "",
     latitude: "",
     longitude: "",
     operatingHours: "",
+    contactInfo: "",
+    img: "",
+    daysOfOperation: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false,
+    },
+    availableProducts: {
+      fruits: false,
+      vegetables: false,
+      grains:false
+    },
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const uploadFile = () => {
-      // ... (your file upload logic remains the same)
-      const name = new Date().getTime() + file.name;
-      const storageRef = ref(storage, file.name);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          setPercentage(progress);
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
+      if (file) {
+        const name = new Date().getTime() + file.name;
+        const storageRef = ref(storage, name);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Upload is " + progress + "% done");
+            setPercentage(progress);
+          },
+          (error) => {
+            console.log(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setData({ img: downloadURL });
+              toast.success("Image Uploaded Successfully");
+            });
           }
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setData((prev) => ({ ...prev, img: downloadURL }));
-          });
-        }
-      );
+        );
+      }
     };
-    file && uploadFile();
+
+    uploadFile();
   }, [file]);
 
   useEffect(() => {
@@ -62,26 +77,50 @@ const UpdateMarket = () => {
       try {
         const guideDoc = await getDoc(doc(db, "marketNearMe", nearmeId));
         if (guideDoc.exists()) {
-          // Set the guideData state with the fetched data
           const data = guideDoc.data();
-          setMarketData(data); // Populate the form fields with the data from the database
+          setMarketData(data);
         } else {
-          console.log("Guide not found.");
+          console.log("Market not found.");
         }
       } catch (error) {
         console.log(error);
       }
     };
-    fetchMarketData(); // Fetch data when the component is mounted and 'id' changes
+    fetchMarketData();
   }, [nearmeId]);
 
   const handleUpdate = async () => {
     try {
+      if (data.img) {
+        marketData.img = data.img;
+      }
       await updateDoc(doc(db, "marketNearMe", nearmeId), marketData);
-      console.log("Guide updated successfully!");
+      toast.success("Market Data Updated Successfully");
+      navigate(-1);
     } catch (error) {
-      console.log("Error updating guide:", error);
+      toast.error("Market data not Updated");
     }
+  };
+
+  // Checkbox change handlers
+  const handleDaysOfOperationChange = (day) => {
+    setMarketData({
+      ...marketData,
+      daysOfOperation: {
+        ...marketData.daysOfOperation,
+        [day]: !marketData.daysOfOperation[day],
+      },
+    });
+  };
+
+  const handleAvailableProductsChange = (product) => {
+    setMarketData({
+      ...marketData,
+      availableProducts: {
+        ...marketData.availableProducts,
+        [product]: !marketData.availableProducts[product],
+      },
+    });
   };
 
   return (
@@ -90,15 +129,15 @@ const UpdateMarket = () => {
       <div className="newContainer">
         <Navbar />
         <div className="top">
-          <h1>Update Markets Near Me</h1>
+          <h1>Update Market Near Me</h1>
         </div>
         <div className="bottom">
           <div className="left">
             <img
               src={
-                file
-                  ? URL.createObjectURL(file)
-                  : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                data.img ||
+                marketData.img ||
+                "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
               }
               alt=""
             />
@@ -125,8 +164,10 @@ const UpdateMarket = () => {
                   onChange={(e) =>
                     setMarketData({ ...marketData, name: e.target.value })
                   }
-                  placeholder="Title"
+                  placeholder="Name"
                 />
+              </div>
+              <div className="formInput">
                 <label>Address</label>
                 <input
                   type="text"
@@ -134,48 +175,136 @@ const UpdateMarket = () => {
                   onChange={(e) =>
                     setMarketData({ ...marketData, address: e.target.value })
                   }
-                  placeholder="Content"
+                  placeholder="Address"
                 />
-                <label>Latitude</label>
+              </div>
+              <div className="formInput">
+                <label>City</label>
                 <input
                   type="text"
-                  value={marketData.latitude}
+                  value={marketData.city}
                   onChange={(e) =>
-                    setMarketData({ ...marketData, latitude: e.target.value })
+                    setMarketData({ ...marketData, city: e.target.value })
                   }
-                  placeholder="Category"
+                  placeholder="City"
                 />
-                <label>Longitude</label>
-                <input
-                  type="text"
-                  value={marketData.longitude}
-                  onChange={(e) =>
-                    setMarketData({ ...marketData, longitude: e.target.value })
-                  }
-                  placeholder="Category"
-                />
+              </div>
+
+              <div className="formInput">
                 <label>Operating Hours</label>
                 <input
                   type="text"
                   value={marketData.operatingHours}
                   onChange={(e) =>
-                    setMarketData({ ...marketData, operatingHours: e.target.value })
+                    setMarketData({
+                      ...marketData,
+                      operatingHours: e.target.value,
+                    })
                   }
-                  placeholder="Category"
+                  placeholder="Operating Hours"
                 />
-                
-                <button disabled={percentage !== null && percentage < 100} type="button" onClick={handleUpdate}>
-                  Update Guide
-                </button>
               </div>
+              <div className="formInput">
+                <label>Contact Info</label>
+                <input
+                  type="text"
+                  value={marketData.contactInfo}
+                  onChange={(e) =>
+                    setMarketData({
+                      ...marketData,
+                      contactInfo: e.target.value,
+                    })
+                  }
+                  placeholder="Enter Contact"
+                />
+              </div>
+              <div className="formInput">
+                <label>Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  value={marketData.latitude}
+                  onChange={(e) =>
+                    setMarketData({ ...marketData, latitude: e.target.value })
+                  }
+                  placeholder="Latitude"
+                />
+              </div>
+              <div className="formInput">
+                <label>Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  value={marketData.longitude}
+                  onChange={(e) =>
+                    setMarketData({ ...marketData, longitude: e.target.value })
+                  }
+                  placeholder="Longitude"
+                />
+              </div>
+              <div className="formInput">
+                <label>Days of Operation:</label>
+                <div className="checkboxes">
+                  {Object.keys(marketData.daysOfOperation).map((day) => (
+                    <label key={day} htmlFor={day}>
+                      {day.charAt(0).toUpperCase() + day.slice(1)}:
+                      <input
+                        type="checkbox"
+                        id={day}
+                        checked={marketData.daysOfOperation[day]}
+                        onChange={() => handleDaysOfOperationChange(day)}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="formInput">
+                <label>Available Products:</label>
+                <div className="checkboxes">
+                  <label htmlFor="fruits">
+                    Fruits:
+                    <input
+                      type="checkbox"
+                      id="fruits"
+                      checked={marketData.availableProducts.fruits}
+                      onChange={() => handleAvailableProductsChange("fruits")}
+                    />
+                  </label>
+                  <label htmlFor="vegetables">
+                    Vegetables:
+                    <input
+                      type="checkbox"
+                      id="vegetables"
+                      checked={marketData.availableProducts.vegetables}
+                      onChange={() =>
+                        handleAvailableProductsChange("vegetables")
+                      }
+                    />
+                  </label>
+                  <label htmlFor="grains">
+                    Grains:
+                    <input
+                      type="checkbox"
+                      id="grains"
+                      checked={marketData.availableProducts.grains}
+                      onChange={() => handleAvailableProductsChange("grains")}
+                    />
+                  </label>
+                </div>
+              </div>
+              <button
+                disabled={percentage !== null && percentage < 100}
+                type="button"
+                onClick={handleUpdate}
+              >
+                Update Market
+              </button>
             </form>
           </div>
-          
         </div>
         <NearMeDataTable />
       </div>
     </div>
-
   );
 };
 

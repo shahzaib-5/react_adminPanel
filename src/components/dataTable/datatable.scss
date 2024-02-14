@@ -55,6 +55,16 @@
             background-color: rgba(255, 0, 0, 0.089);
         }
 
+        &.succeeded {
+            color: red; // Change the color accordingly
+            // background-color: /* Specify the background color for Succeeded */;
+          }
+        
+          &.completed {
+            color: green; // Change the color accordingly
+            // background-color: /* Specify the background color for Completed */;
+          }
+
         
     }
 
